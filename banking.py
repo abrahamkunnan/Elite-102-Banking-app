@@ -1,71 +1,32 @@
-bankfirst = input("\nThis is the bank. What do you want to do? \n Check Balance (cb) \n Deposit (d) \n Withdraw (w) \n Change Account Info (ca) \n Delete Account (da) \n Modify Account (ma) \n Exit (e) \n\n")
-balance = 0
-placeholder = True
-accountname = "John Doe"
+import mysql.connector
 
-def invalid():
-    print("\nThis is not a valid option")
+sl = int(input("Type a ID: "))
+slname = input("Type a Username: ")
 
-def exit():
-   quit()
- 
-def checkbalance():
-    global balance
-    global accountname
-    print("\n"+ accountname + " your current balance is " + "$" + str(balance))
-    
-def deposit():
-    global balance
-    global accountname
-    dollar = float(input("\nType the amount you want to deposit "))
-    rounddollar = round(dollar, 2)
-    balance += rounddollar
-    print("\n"+ accountname + " your new balance is " + "$" + str(balance))
+connection = mysql.connector.connect(user = "root", database = "banks", password = "popgamer#10")
 
-def changeaccountinfo():
-   global accountname
-   accountname = input("\n" + accountname + " set a new username ")
-   print("\n" + "Your new username is " + accountname)
+cursor = connection.cursor()
 
-def deleteaccount():
-   print("\n" + "Your account will be deleted")
-   quit()
+addData = ("INSERT INTO bankaccount (ID, Username) VALUES ('{}', '{}')".format (sl, slname))
 
-def withdraw():
-    global balance
-    global accountname
-    dollar = float(input("\nType the amount you want to withdraw "))
-    rounddollar = round(dollar, 2)
-    balance -= rounddollar
-    print("\n"+ accountname + " your new balance is " + "$" + str(balance))
+returnpin = ("select PIN from bankaccount where username=('{}')".format(slname))
 
-while placeholder:
-  
-  if bankfirst == "e":
-    exit()
-    bankfirst = input("\nThis is the bank. What do you want to do? \n Check Balance (cb) \n Deposit (d) \n Withdraw (w) \n Change Account Info (ca) \n Delete Account (da) \n Exit (e) \n\n")
+returnbalance =  ("select Balance from bankaccount where username=('{}')".format(slname))
 
-  if bankfirst == "cb":
-    checkbalance()
-    bankfirst = input("\nThis is the bank. What do you want to do? \n Check Balance (cb) \n Deposit (d) \n Withdraw (w) \n Change Account Info (ca) \n Delete Account (da) \n Exit (e) \n\n")
+cursor.execute(addData)
 
-  if bankfirst == "d":
-    deposit()
-    bankfirst = input("\nThis is the bank. What do you want to do? \n Check Balance (cb) \n Deposit (d) \n Withdraw (w) \n Change Account Info (ca) \n Delete Account (da) \n Exit (e) \n\n")
+cursor.execute(returnpin)
 
-  if bankfirst == "w":
-    withdraw()
-    bankfirst = input("\nThis is the bank. What do you want to do? \n Check Balance (cb) \n Deposit (d) \n Withdraw (w) \n Change Account Info (ca) \n Delete Account (da) \n Exit (e) \n\n")
+for item in cursor:
+    print("Your PIN is " + str(item))
 
-  if bankfirst == "ca":
-    changeaccountinfo()
-    bankfirst = input("\nThis is the bank. What do you want to do? \n Check Balance (cb) \n Deposit (d) \n Withdraw (w) \n Change Account Info (ca) \n Delete Account (da) \n Exit (e) \n\n")
-  
-  if bankfirst == "da":
-    deleteaccount()
+cursor.execute(returnbalance)
 
-  if bankfirst != "cb" and bankfirst != "e" and bankfirst != "d" and bankfirst != "w" and bankfirst != "ca" and bankfirst!= "da":
-     invalid()
-     bankfirst = input("\nThis is the bank. What do you want to do? \n Check Balance (cb) \n Deposit (d) \n Withdraw (w) \n Change Account Info (ca) \n Delete Account (da) \n Exit (e) \n\n") 
-     
-  bankfirst = bankfirst
+for money in cursor:
+    print("Your balance is " + str(money))
+
+connection.commit()
+
+cursor.close()
+
+connection.close()
